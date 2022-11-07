@@ -14,7 +14,6 @@ add('writable_dirs', []);
 // Hosts
 
 host('extension.isedo.pl')
-    ->stage('prod')
     ->set('remote_user', 'deploy')
     ->set('deploy_path', '~/apps/extension');
 
