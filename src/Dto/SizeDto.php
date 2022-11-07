@@ -6,7 +6,7 @@ namespace App\Dto;
 
 final class SizeDto
 {
-    public int $size;
+    public float $size;
     public bool $tester;
     public bool $set;
     public float $price;
