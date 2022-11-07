@@ -1,0 +1,10 @@
+search:
+    path: /search/{provider}/{name}
+    controller: App\Controller\SearchAction
+    requirements: 
+        provider: perfumehub.pl|example.com
+proxy:
+    path: /proxy/{provider}/{path}
+    controller: App\Controller\ProxyAction
+    requirements: 
+        provider: perfumehub.pl|example.com

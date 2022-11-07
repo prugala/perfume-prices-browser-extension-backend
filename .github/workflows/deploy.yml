@@ -1,0 +1,21 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    name: Deploy code to prod
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      -   name: Deploy
+          uses: appleboy/ssh-action@master
+          with:
+            host: ${{ secrets.DEPLOY_HOST }}
+            username: ${{ secrets.DEPLOY_USER }}
+            key: ${{ secrets.DEPLOY_KEY }}
+            port: ${{ secrets.DEPLOY_PORT }}
+            script: ${{ secrets.DEPLOY_COMMAND }} prod
