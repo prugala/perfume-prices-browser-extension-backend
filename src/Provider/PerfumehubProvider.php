@@ -52,6 +52,17 @@ class PerfumehubProvider implements ProviderInterface
         return $data;
     }
 
+    public function getPriceHistory(array $params): array
+    {
+        $params = array_merge([
+            'mode' => 'product',
+        ], $params);
+
+        return $this->client->request(Request::METHOD_GET, 'price-history', [
+            'query' => $params,
+        ])->toArray();
+    }
+
     /**
      * @param array $types
      * @return TypeDto[]|array
@@ -107,6 +118,10 @@ class PerfumehubProvider implements ProviderInterface
         $sizeDto->set = $product['isSet'];
         $sizeDto->price = $product['price'];
         $sizeDto->priceChange = $product['priceChange'];
+        $sizeDto->brand = $product['brand'];
+        $sizeDto->line = $product['line'];
+        $sizeDto->type = $product['type'];
+        $sizeDto->gender = $product['gender'];
 
         foreach ($product['offers'] as $offer) {
             $priceDto = new PriceDto();

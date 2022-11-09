@@ -8,3 +8,8 @@ proxy:
     controller: App\Controller\ProxyAction
     requirements: 
         provider: perfumehub.pl|example.com
+price_history:
+    path: /price-history/{provider}
+    controller: App\Controller\PriceHistoryAction
+    requirements:
+        provider: perfumehub.pl|example.com

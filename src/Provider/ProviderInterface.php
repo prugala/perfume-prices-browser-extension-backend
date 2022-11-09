@@ -12,5 +12,7 @@ interface ProviderInterface
 
     public function getData(string $path): DataDto;
 
+    public function getPriceHistory(array $params): array;
+
     public function search(string $name): string;
 }

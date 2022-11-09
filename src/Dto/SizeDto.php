@@ -11,6 +11,10 @@ final class SizeDto
     public bool $set;
     public float $price;
     public float $priceChange;
+    public string $brand;
+    public string $line;
+    public string $type;
+    public string $gender;
     /** @var PriceDto[] */
     public array $prices = [];
 }
