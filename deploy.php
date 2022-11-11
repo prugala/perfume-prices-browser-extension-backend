@@ -5,7 +5,7 @@ require 'recipe/symfony.php';
 
 // Config
 
-set('repository', 'git@github.com:prugala/fragrantica-browser-extension-backend.git');
+set('repository', 'git@github.com:prugala/perfume-prices-browser-extension-backend.git');
 
 add('shared_files', []);
 add('shared_dirs', []);

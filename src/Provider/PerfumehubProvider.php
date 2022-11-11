@@ -32,6 +32,15 @@ class PerfumehubProvider implements ProviderInterface
     {
         $response = $this->client->request(Request::METHOD_GET, sprintf('/typeahead?q=%s', $name));
         $data = $response->toArray();
+        $nameParts = explode(' ', $name);
+
+        foreach ($data as $datum) {
+            foreach ($nameParts as $namePart) {
+                if (str_contains($datum['line'], $namePart)) {
+                    return $datum['productLink'];
+                }
+            }
+        }
 
         if (count($data) > 0) {
             return $data[0]['productLink'];
