@@ -36,7 +36,7 @@ class PerfumehubProvider implements ProviderInterface
 
         foreach ($data as $datum) {
             foreach ($nameParts as $namePart) {
-                if (str_contains($datum['line'], $namePart)) {
+                if (!!preg_match('#\\b' . preg_quote(strtolower($namePart), '#') . '\\b#i', strtolower($datum['line']))) {
                     return $datum['productLink'];
                 }
             }
