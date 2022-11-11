@@ -24,7 +24,6 @@ class SearchAction
         try {
             $provider = $this->builder->getProvider($provider);
             $data = $provider->search($name);
-            dd($data);
         } catch (ProductNotFound) {
             throw new NotFoundHttpException();
         } catch (\Throwable $exception) {
