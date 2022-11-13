@@ -8,8 +8,10 @@ use App\Dto\DataDto;
 use App\Dto\PriceDto;
 use App\Dto\SizeDto;
 use App\Dto\TypeDto;
+use App\Enum\PageType;
 use App\Enum\TypeEnum;
 use App\Exception\ProductNotFound;
+use App\Repository\ProductLinkRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -18,7 +20,7 @@ class PerfumehubProvider implements ProviderInterface
     private const NAME = 'perfumehub.pl';
     private const HOST = 'https://perfumehub.pl';
 
-    public function __construct(private HttpClientInterface $client)
+    public function __construct(private readonly ProductLinkRepository $productLinkRepository, private HttpClientInterface $client)
     {
         $this->client = $this->client->withOptions(['base_uri' => self::HOST, 'headers' => ['X-Requested-With' => 'XMLHttpRequest']]);
     }
@@ -28,8 +30,21 @@ class PerfumehubProvider implements ProviderInterface
         return self::NAME;
     }
 
-    public function search(string $name): string
+    public function search(string $name, ?PageType $pageType = null, ?int $id = null): string
     {
+        if ($pageType && $id) {
+            $productLink = $this->productLinkRepository->findOneBy([
+                'active' => true,
+                'provider' => self::NAME,
+                'productId' => $id,
+                'page' => $pageType
+            ]);
+
+            if ($productLink) {
+                return $productLink->getUrl();
+            }
+        }
+
         $response = $this->client->request(Request::METHOD_GET, sprintf('/typeahead?q=%s', $name));
         $data = $response->toArray();
         $nameParts = explode(' ', $name);
