@@ -37,7 +37,7 @@ class PerfumehubProvider implements ProviderInterface
                 'active' => true,
                 'provider' => self::NAME,
                 'productId' => $id,
-                'page' => $pageType
+                'page' => $pageType->value
             ]);
 
             if ($productLink) {
