@@ -17,7 +17,7 @@ class ProductLink
     #[ORM\Column]
     private int $productId;
 
-    #[ORM\Column(enumType: PageType::class)]
+    #[ORM\Column(length: 255)]
     private string $page;
 
     #[ORM\Column(length: 255)]
