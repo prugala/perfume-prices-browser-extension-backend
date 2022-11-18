@@ -24,7 +24,7 @@ class ReportLinkAction
     {
         try {
             $provider = $this->builder->getProvider($provider);
-            $provider->reportLink($request->get('id'), PageType::tryFrom($request->get('page', '')), $request->get('url'));
+            $provider->reportLink($request->get('id'), PageType::tryFrom($request->get('page', '')) ?? '', $request->get('url'));
         } catch (ProviderNotFound) {
             throw new NotFoundHttpException();
         } catch (\Throwable $exception) {
