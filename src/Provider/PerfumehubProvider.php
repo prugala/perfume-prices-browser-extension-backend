@@ -95,6 +95,7 @@ class PerfumehubProvider implements ProviderInterface
         $link
             ->setPage($pageType->value)
             ->setProductId($id)
+            ->setProvider($this->getName())
             ->setUrl($url);
 
         $this->entityManager->persist($link);

@@ -24,7 +24,6 @@ class ReportLinkAction
     {
         try {
             $provider = $this->builder->getProvider($provider);
-            $body = $request->getContent();
             $data = json_decode($request->getContent(), true);
             $provider->reportLink($data['id'], PageType::tryFrom($data['page']) ?? '', $data['url']);
         } catch (ProviderNotFound) {
