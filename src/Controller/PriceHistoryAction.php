@@ -27,7 +27,6 @@ class PriceHistoryAction
         } catch (ProviderNotFound) {
             throw new NotFoundHttpException();
         } catch (\Throwable $exception) {
-            dd($exception->getMessage());
             $this->logger->error($exception->getMessage(), ['context' => $exception]);
 
             throw new BadRequestHttpException();

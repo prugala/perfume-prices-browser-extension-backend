@@ -13,3 +13,8 @@ price_history:
     controller: App\Controller\PriceHistoryAction
     requirements:
         provider: perfumehub.pl|example.com
+report_link:
+    path: /report-link/{provider}
+    controller: App\Controller\ReportLinkAction
+    requirements:
+        provider: perfumehub.pl|example.com

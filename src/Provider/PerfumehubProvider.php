@@ -8,10 +8,12 @@ use App\Dto\DataDto;
 use App\Dto\PriceDto;
 use App\Dto\SizeDto;
 use App\Dto\TypeDto;
+use App\Entity\ProductLink;
 use App\Enum\PageType;
 use App\Enum\TypeEnum;
 use App\Exception\ProductNotFound;
 use App\Repository\ProductLinkRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -20,7 +22,7 @@ class PerfumehubProvider implements ProviderInterface
     private const NAME = 'perfumehub.pl';
     private const HOST = 'https://perfumehub.pl';
 
-    public function __construct(private readonly ProductLinkRepository $productLinkRepository, private HttpClientInterface $client)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly ProductLinkRepository $productLinkRepository, private HttpClientInterface $client)
     {
         $this->client = $this->client->withOptions(['base_uri' => self::HOST, 'headers' => ['X-Requested-With' => 'XMLHttpRequest']]);
     }
@@ -85,6 +87,18 @@ class PerfumehubProvider implements ProviderInterface
         return $this->client->request(Request::METHOD_GET, 'price-history', [
             'query' => $params,
         ])->toArray();
+    }
+
+    public function reportLink(int $id, PageType $pageType, string $url): void
+    {
+        $link = new ProductLink();
+        $link
+            ->setPage($pageType->value)
+            ->setProductId($id)
+            ->setUrl($url);
+
+        $this->entityManager->persist($link);
+        $this->entityManager->flush();
     }
 
     /**

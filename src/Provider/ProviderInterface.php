@@ -16,4 +16,6 @@ interface ProviderInterface
     public function getPriceHistory(array $params): array;
 
     public function search(string $name, ?PageType $pageType = null, ?int $id = null): string;
+
+    public function reportLink(int $id, PageType $pageType, string $url): void;
 }

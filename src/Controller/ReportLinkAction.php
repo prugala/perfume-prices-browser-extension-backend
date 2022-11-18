@@ -4,25 +4,27 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Enum\PageType;
 use App\Exception\ProviderNotFound;
 use App\Provider\Builder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class ProxyAction
+class ReportLinkAction
 {
     public function __construct(private readonly Builder $builder, private readonly LoggerInterface $logger)
     {
     }
 
-    public function __invoke(string $provider, string $path): Response
+    public function __invoke(Request $request, string $provider): Response
     {
         try {
             $provider = $this->builder->getProvider($provider);
-            $data = $provider->getData($path);
+            $provider->reportLink($request->get('id'), PageType::tryFrom($request->get('page', '')), $request->get('url'));
         } catch (ProviderNotFound) {
             throw new NotFoundHttpException();
         } catch (\Throwable $exception) {
@@ -30,6 +32,6 @@ class ProxyAction
 
             throw new BadRequestHttpException();
         }
-        return new JsonResponse($data);
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }
