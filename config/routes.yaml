@@ -3,6 +3,7 @@ search:
     controller: App\Controller\SearchAction
     requirements: 
         provider: perfumehub.pl|example.com
+        name: ".+"
 proxy:
     path: /proxy/{provider}/{path}
     controller: App\Controller\ProxyAction
