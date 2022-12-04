@@ -17,14 +17,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class PerfumehubProvider implements ProviderInterface
+class PerfumomaniakProvider implements ProviderInterface
 {
-    private const NAME = 'perfumehub.pl';
-    private const HOST = 'https://perfumehub.pl';
+    private const NAME = 'perfumomaniak.pl';
+    private const HOST = 'https://perfumomaniak.pl';
 
     public function __construct(private readonly EntityManagerInterface $entityManager, private readonly ProductLinkRepository $productLinkRepository, private HttpClientInterface $client)
     {
-        $this->client = $this->client->withOptions(['base_uri' => self::HOST, 'headers' => ['X-Requested-With' => 'XMLHttpRequest']]);
+        $this->client = $this->client->withOptions(['base_uri' => self::HOST]);
     }
 
     public function getName(): string
@@ -47,23 +47,15 @@ class PerfumehubProvider implements ProviderInterface
             }
         }
 
-        $response = $this->client->request(Request::METHOD_GET, sprintf('/typeahead?q=%s', $name));
-        $data = $response->toArray();
-        $nameParts = explode(' ', $name);
+        $response = $this->client->request(Request::METHOD_GET, sprintf('api/perfumes/%s', $name));
 
-        foreach ($data as $datum) {
-            foreach ($nameParts as $namePart) {
-                if (!!preg_match('#\\b' . preg_quote(strtolower($namePart), '#') . '\\b#i', strtolower($datum['line']))) {
-                    return $datum['productLink'];
-                }
-            }
+        try {
+            $data = $response->toArray();
+
+            return (string)$data['id'];
+        } catch (\Throwable) {
+            throw new ProductNotFound($name, self::NAME);
         }
-
-        if (count($data) > 0) {
-            return $data[0]['productLink'];
-        }
-
-        throw new ProductNotFound($name, self::NAME);
     }
 
     public function getData(string $providerData): DataDto
@@ -71,9 +63,9 @@ class PerfumehubProvider implements ProviderInterface
         $data = new DataDto();
         $data->provider = self::NAME;
 
-        $response = $this->client->request(Request::METHOD_GET, $providerData);
+        $response = $this->client->request(Request::METHOD_GET, sprintf('/api/pricelist/%s', $providerData));
 
-        $data->types = $this->prepareTypes($response->toArray()['typeLinks']);
+        $data->types = $this->prepareTypes($response->toArray()['Types']);
 
         return $data;
     }
@@ -112,10 +104,10 @@ class PerfumehubProvider implements ProviderInterface
 
         foreach ($types as $type) {
             $typeDto = new TypeDto();
-            $typeDto->code = TypeEnum::tryFrom(strtolower($type['type']));
+            $typeDto->code = TypeEnum::tryFrom(strtolower($type['Code']));
             $typeDto->name = $typeDto->code->name();
-            $typeDto->url = $type['url'];
-            $typeDto->sizes = $this->prepareSizes($type['url']);
+            $typeDto->url = $type['Url'];
+            $typeDto->sizes = $this->prepareSizes($type['Sizes']);
             $data[] = $typeDto;
         }
 
@@ -123,27 +115,15 @@ class PerfumehubProvider implements ProviderInterface
     }
 
     /**
-     * @param string $uri
+     * @param array $sizes
      * @return SizeDto[]|array
      */
-    private function prepareSizes(string $uri): array
+    private function prepareSizes(array $sizes): array
     {
         $data = [];
 
-        $response = $this->client->request(Request::METHOD_GET, $uri);
-
-        foreach ($response->toArray()['products'] as $product) {
-            if (array_key_exists('offers', $product) && $product['size']) {
-                $data[] = $this->createSize($product);
-            } else {
-                $subResponse = $this->client->request(Request::METHOD_GET, $product['productLink']);
-
-                foreach ($subResponse->toArray()['products'] as $subProduct) {
-                    if (array_key_exists('offers', $subProduct) && $subProduct['size']) {
-                        $data[] = $this->createSize($subProduct);
-                    }
-                }
-            }
+        foreach ($sizes as $size) {
+            $data[] = $this->createSize($size);
         }
 
         return $data;
@@ -152,22 +132,22 @@ class PerfumehubProvider implements ProviderInterface
     private function createSize(array $product): SizeDto
     {
         $sizeDto = new SizeDto();
-        $sizeDto->size = $product['size'];
-        $sizeDto->tester = $product['tester'];
-        $sizeDto->set = $product['isSet'];
-        $sizeDto->price = $product['price'];
-        $sizeDto->priceChange = $product['priceChange'];
-        $sizeDto->brand = $product['brand'];
-        $sizeDto->line = $product['line'];
-        $sizeDto->type = $product['type'];
-        $sizeDto->gender = $product['gender'];
+        $sizeDto->size = $product['Size'];
+        $sizeDto->tester = $product['Tester'];
+        $sizeDto->set = false;
+        $sizeDto->price = $product['Price'];
+        $sizeDto->priceChange = 0;
+        $sizeDto->brand = $product['Brand'];
+        $sizeDto->line = $product['Line'];
+        $sizeDto->type = $product['Type'];
+        $sizeDto->gender = $product['Gender'];
 
-        foreach ($product['offers'] as $offer) {
+        foreach ($product['Prices'] as $offer) {
             $priceDto = new PriceDto();
-            $priceDto->shopName = $offer['shopNameReal'];
-            $priceDto->url = $offer['url'];
-            $priceDto->price = $offer['price'];
-            $priceDto->priceChange = $offer['priceChange'];
+            $priceDto->shopName = $offer['ShopName'];
+            $priceDto->url = $offer['Url'];
+            $priceDto->price = $offer['Price'];
+            $priceDto->priceChange = 0;
             $sizeDto->prices[] = $priceDto;
         }
 

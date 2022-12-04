@@ -2,20 +2,20 @@ search:
     path: /search/{provider}/{name}
     controller: App\Controller\SearchAction
     requirements: 
-        provider: perfumehub.pl|example.com
+        provider: perfumehub.pl|perfumomaniak.pl
         name: ".+"
 proxy:
-    path: /proxy/{provider}/{path}
+    path: /proxy/{provider}/{providerData}
     controller: App\Controller\ProxyAction
     requirements: 
-        provider: perfumehub.pl|example.com
+        provider: perfumehub.pl|perfumomaniak.pl
 price_history:
     path: /price-history/{provider}
     controller: App\Controller\PriceHistoryAction
     requirements:
-        provider: perfumehub.pl|example.com
+        provider: perfumehub.pl|perfumomaniak.pl
 report_link:
     path: /report-link/{provider}
     controller: App\Controller\ReportLinkAction
     requirements:
-        provider: perfumehub.pl|example.com
+        provider: perfumehub.pl|perfumomaniak.pl

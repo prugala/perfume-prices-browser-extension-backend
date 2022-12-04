@@ -18,11 +18,11 @@ class ProxyAction
     {
     }
 
-    public function __invoke(string $provider, string $path): Response
+    public function __invoke(string $provider, string $providerData): Response
     {
         try {
             $provider = $this->builder->getProvider($provider);
-            $data = $provider->getData($path);
+            $data = $provider->getData($providerData);
         } catch (ProviderNotFound) {
             throw new NotFoundHttpException();
         } catch (\Throwable $exception) {

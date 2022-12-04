@@ -6,9 +6,7 @@ namespace App\Controller;
 
 use App\Enum\PageType;
 use App\Exception\ProductNotFound;
-use App\Exception\ProviderNotFound;
 use App\Provider\Builder;
-use App\Repository\ProductRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
