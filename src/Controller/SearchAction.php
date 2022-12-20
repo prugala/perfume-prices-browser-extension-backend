@@ -8,6 +8,7 @@ use App\Enum\PageType;
 use App\Exception\ProductNotFound;
 use App\Provider\Builder;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +26,7 @@ class SearchAction
         try {
             $provider = $this->builder->getProvider($provider);
             $data = $provider->search($name, PageType::tryFrom($request->query->get('page') ?? ''), (int)$request->query->get('id'));
-        } catch (ProductNotFound) {
+        } catch (ProductNotFound | JsonException) {
             throw new NotFoundHttpException();
         } catch (\Throwable $exception) {
             $this->logger->error($exception->getMessage(), ['context' => $exception]);
