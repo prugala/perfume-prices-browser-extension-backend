@@ -50,8 +50,8 @@ class PerfumehubProvider implements ProviderInterface
         $response = $this->client->request(Request::METHOD_GET, sprintf('/typeahead?q=%s', $name));
         $data = $response->toArray();
         $nameParts = explode(' ', $name);
-
-        foreach ($data as $datum) {
+        $products = $data['products'] ?? [];
+        foreach ($products as $datum) {
             foreach ($nameParts as $namePart) {
                 if (!!preg_match('#\\b' . preg_quote(strtolower($namePart), '#') . '\\b#i', strtolower($datum['line']))) {
                     return $datum['productLink'];
@@ -59,8 +59,8 @@ class PerfumehubProvider implements ProviderInterface
             }
         }
 
-        if (count($data) > 0) {
-            return $data[0]['productLink'];
+        if (count($products) > 0) {
+            return $products[0]['productLink'];
         }
 
         throw new ProductNotFound($name, self::NAME);
